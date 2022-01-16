@@ -14,6 +14,7 @@ $1
 usage: lit [options] file...
 
 options:
+    -m meta-html-file
     -h header-html-file
     -f footer-html-file
     -o output-directory
@@ -31,6 +32,9 @@ description:
     - a single file
     - a directory (all files in the directory are processed)
     - the string "-" (standard input is processed)
+
+    the meta HTML file is inlined into the head of the final document
+    if provided
 
     the header and footer HTML files given in command line options
     are inlined into the top and bottom of the final document's body
@@ -90,15 +94,17 @@ dotest() {
 }
 
 ptest=
+pmeta=
 pheader=
 pfooter=
 pdir=${LIT_OUT_DIR:-$(pwd)}
 pscripts=${LIT_SCRIPT_DIR:-$(dirname "$0")/scripts}
 
-while getopts :t:h:f:o: arg
+while getopts :t:m:h:f:o: arg
 do
     case "$arg" in
         t) ptest=$OPTARG ;;
+        m) pmeta=$OPTARG ;;
         h) pheader=$OPTARG ;;
         f) pfooter=$OPTARG ;;
         o) pdir=$OPTARG ;;
@@ -142,6 +148,8 @@ cat > "$pdir/page.html" <<EOF
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 EOF
+
+[ -f "$pmeta" ] && cat "$pmeta" >> "$pdir/page.html"
 
 awk -f "$pscripts/lit-meta.awk" "${pfiles[@]}" >> "$pdir/page.html"
 
