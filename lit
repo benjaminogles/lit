@@ -53,10 +53,10 @@ description:
     running tests with the "assert" argument will check that the
     output of the following command
 
-    lit -o {tempdir} ./tests/{file}.in
+    lit -o {tempdir} ./tests/{file}
 
     matches the contents of ./tests/{file}.out for all files and
-    directories with names in ./tests/*.in
+    directories tests without the .out extension
 
     running tests with the "generate" argument will (re)generate the
     files ./tests/{file}.out
@@ -70,13 +70,13 @@ recurse() {
 
 dotest() {
     [ -d ./tests ] || fail "test directory does not exist"
-    echo "running tests..."
+    echo "running tests"
     outdir=/tmp/lit.out.d
-    for testin in $(find ./tests -name '*.in')
+    for testin in $(find ./tests -mindepth 1 -maxdepth 1 -name '*.out' -prune -o -print)
     do
         [ -d $outdir ] && rm -r $outdir
         mkdir /tmp/lit.out.d
-        testout=${testin%.in}.out
+        testout=$testin.out
         if [ "$1" == "generate" ]
         then
             echo "generating $testout"
@@ -86,6 +86,7 @@ dotest() {
         then
             fail "expected test output not found: $testout"
         else
+            echo "running $testin"
             recurse -o $outdir "$testin"
             diff "$testout" $outdir/index.html || fail "failed test: $testin"
         fi
@@ -151,7 +152,7 @@ EOF
 
 [ -f "$pmeta" ] && cat "$pmeta" >> "$pdir/index.html"
 
-awk -f "$pscripts/lit-meta.awk" "${pfiles[@]}" >> "$pdir/index.html"
+awk -f "$pscripts/lit-utils.awk" -f "$pscripts/lit-meta.awk" "${pfiles[@]}" >> "$pdir/index.html"
 
 cat >> "$pdir/index.html" <<EOF
 </head>
