@@ -22,7 +22,7 @@ options:
 
 description:
     lit generates an HTML document from source code and writes it
-    to {output-directory}/page.html
+    to {output-directory}/index.html
 
     the default output directory can be given by the LIT_OUT_DIR
     environment variable and is otherwise given by \$(pwd)
@@ -81,13 +81,13 @@ dotest() {
         then
             echo "generating $testout"
             recurse -o $outdir "$testin"
-            cp $outdir/page.html "$testout"
+            cp $outdir/index.html "$testout"
         elif [ ! -f "$testout" ]
         then
             fail "expected test output not found: $testout"
         else
             recurse -o $outdir "$testin"
-            diff "$testout" $outdir/page.html || fail "failed test: $testin"
+            diff "$testout" $outdir/index.html || fail "failed test: $testin"
         fi
     done
     echo "all tests passed"
@@ -140,7 +140,7 @@ fi
 
 [ -d "$pdir" ] || mkdir "$pdir"
 
-cat > "$pdir/page.html" <<EOF
+cat > "$pdir/index.html" <<EOF
 <!doctype html>
 
 <html lang="en">
@@ -149,32 +149,32 @@ cat > "$pdir/page.html" <<EOF
     <meta name="viewport" content="width=device-width, initial-scale=1">
 EOF
 
-[ -f "$pmeta" ] && cat "$pmeta" >> "$pdir/page.html"
+[ -f "$pmeta" ] && cat "$pmeta" >> "$pdir/index.html"
 
-awk -f "$pscripts/lit-meta.awk" "${pfiles[@]}" >> "$pdir/page.html"
+awk -f "$pscripts/lit-meta.awk" "${pfiles[@]}" >> "$pdir/index.html"
 
-cat >> "$pdir/page.html" <<EOF
+cat >> "$pdir/index.html" <<EOF
 </head>
 <body>
 EOF
 
-[ -f "$pheader" ] && cat "$pheader" >> "$pdir/page.html"
+[ -f "$pheader" ] && cat "$pheader" >> "$pdir/index.html"
 
-cat >> "$pdir/page.html" <<EOF
+cat >> "$pdir/index.html" <<EOF
 <main>
 <article>
 EOF
 
-awk -f "$pscripts/lit-main.awk" "${pfiles[@]}" >> "$pdir/page.html"
+awk -f "$pscripts/lit-main.awk" "${pfiles[@]}" >> "$pdir/index.html"
 
-cat >> "$pdir/page.html" <<EOF
+cat >> "$pdir/index.html" <<EOF
 </article>
 </main>
 EOF
 
-[ -f "$pfooter" ] && cat "$pfooter" >> "$pdir/page.html"
+[ -f "$pfooter" ] && cat "$pfooter" >> "$pdir/index.html"
 
-cat >> "$pdir/page.html" <<EOF
+cat >> "$pdir/index.html" <<EOF
 </body>
 </html>
 EOF
