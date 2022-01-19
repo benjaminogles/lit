@@ -11,7 +11,7 @@ fail() {
 usage() {
     cat >&2 <<EOF
 $1
-usage: lit [options] file...
+usage: lit [options] file1 [file2 ...]
 
 options:
     -m meta-html-file
@@ -26,12 +26,6 @@ description:
 
     the default output directory can be given by the LIT_OUT_DIR
     environment variable and is otherwise given by \$(pwd)
-
-    the input file can be
-
-    - a single file
-    - a directory (all files in the directory are processed)
-    - the string "-" (standard input is processed)
 
     the meta HTML file is inlined into the head of the final document
     if provided
@@ -121,22 +115,11 @@ then
 fi
 
 shift $(( OPTIND - 1 ))
-pfile=$1
-pfiles=( "$pfile" )
+pfiles=( "$@" )
 
-if [ -z "$pfile" ]
+if [ ${#pfiles[@]} -eq 0 ]
 then
-    usage "you must provide an input file or directory"
-elif [ "$pfile" == "-" ]
-then
-    cat - > /tmp/lit.in
-    pfiles=( /tmp/lit.in )
-elif [ -d "$pfile" ]
-then
-    pfiles=( $(find "$pfile" -type f -maxdepth 1) )
-elif [ ! -f "$pfile" ]
-then
-    usage "could not find input file: $pfile"
+    usage "you must provide at least one input file"
 fi
 
 [ -d "$pdir" ] || mkdir "$pdir"
