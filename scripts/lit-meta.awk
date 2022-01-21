@@ -9,9 +9,9 @@ function title_tag(t)
     return "    <title>" t "</title>"
 }
 
-is_directive() {
-    if(LITDIR[1] == "title")
-        print title_tag(LITDIR[2])
-    else if(LITDIR[1] == "author" || LITDIR[1] == "description")
-        print meta_tag(LITDIR[1], LITDIR[2])
+record_is_directive() {
+    if(LITKEY == "title")
+        print title_tag(LITVAL)
+    else if(LITKEY == "author" || LITKEY == "description")
+        print meta_tag(LITKEY, LITVAL)
 }

@@ -6,72 +6,72 @@ function arg_or_default(_arg)
     return _arg
 }
 
-function is_text_doc()
+function strip_ext(fwithext, _pos, _chars)
+{
+    _pos = split(fwithext, _chars, "")
+    while(_pos > 0 && _chars[_pos] != ".")
+        _pos--
+    return _pos > 1 ? substr(fwithext, 1, _pos-1) : ""
+}
+
+function file_is_text_doc()
 {
     return FILENAME ~ /.*\.(txt|md)/
 }
 
-function is_using_c_style_comments()
+function file_is_using_c_style_comments()
 {
-    return FILENAME ~ /\*\.(c|cc|cpp)/
+    return FILENAME ~ /.*\.(c|cc|cpp)/
 }
 
 function comment_re()
 {
-    if(is_text_doc())
+    if(file_is_text_doc())
         return "^"
-    if(is_using_c_style_comments())
-        return "^ *\\/(\\/|\\*)+ *"
-    # TODO
-    return "^ *# *"
+    if(file_is_using_c_style_comments())
+        return "^\\/(\\/|\\*)"
+    return "^#"
 }
 
-function is_comment(_s)
+function join_fields(from_field, _i, _j)
 {
-    return arg_or_default(_s) ~ comment_re()
-}
-
-function comment(_s, _c)
-{
-    _c = arg_or_default(_s)
-    if(match(_c, comment_re()))
-        return substr(_c, RSTART+RLENGTH)
-    return ""
-}
-
-function directive_re()
-{
-    return "^ *lit *"
-}
-
-function is_directive(_s)
-{
-    if(is_comment(_s) && comment(_s) ~ directive_re())
+    _j = ""
+    for(_i = from_field; _i <= NF; _i++)
     {
-        directive(LITDIR, _s)
+        if(_j) _j = _j " " $_i
+        else   _j = $_i
+    }
+    return _j
+}
+
+function lit_field()
+{
+    if(file_is_text_doc())
+        return 1
+    return 2
+}
+
+function record_is_comment()
+{
+    if($1 ~ comment_re())
+    {
+        COMMENT = join_fields(lit_field())
         return 1
     }
     return 0
 }
 
-function directive(d, _s, _c, _n)
+function record_is_directive(_f)
 {
-    _c = arg_or_default(_s)
-    if(match(_c, directive_re()))
+    _f = lit_field()
+    if(record_is_comment() && $_f == "lit")
     {
-        _n = split(substr(_c, RSTART+RLENGTH), d)
-        if(_n > 1)
-        {
-            _c = ""
-            for(_n = length(d); _n > 1; _n--)
-            {
-                if(!_c) _c = d[_n]
-                else    _c = d[_n] " " _c
-                d[_n + 1] = _d[_n]
-            }
-            d[2] = _c
-        }
+        _f++
+        LITKEY = $_f
+        LITVAL = join_fields(_f + 1)
+        return 1
     }
-    else
-        split("", d)
+    LITKEY = ""
+    LITVAL = ""
+    return 0
 }
