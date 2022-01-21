@@ -51,9 +51,10 @@ usage
 directives
 ----------
 
-- run: run a shell command or build/execute the entire file
-- pipe: consume the next code block without displaying it and pipe it into a program
+- run: display and run a shell command or build/execute the entire file
+- sub: run a shell command without displaying it
 - tee: display the next code block as usual and pipe it into a program
+- pipe: consume the next code block without displaying it and pipe it into a program
 - text: include comment block as text content in document
 - author: specify document author
 - title: specify document title
