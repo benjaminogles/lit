@@ -75,3 +75,31 @@ function record_is_directive(_f)
     LITVAL = ""
     return 0
 }
+
+function file_basename(_n, _fnameparts)
+{
+    _n = split(FILENAME, _fnameparts, "/")
+    if(_n > 0)
+        return _fnameparts[_n]
+    return ""
+}
+
+function build_command_for_file()
+{
+    if(FILENAME ~ /.*\.c$/)
+        return "gcc -o " strip_ext(file_basename()) " " FILENAME
+    else if(FILENAME ~ /.*\.cc$/)
+        return "g++ -o " strip_ext(file_basename()) " " FILENAME
+    else
+        return ""
+}
+
+function run_command_for_file()
+{
+    if(FILENAME ~ /.*\.c$/)
+        return "./" strip_ext(file_basename())
+    else if(FILENAME ~ /.*\.py$/)
+        return "python3 " FILENAME
+    else if(FILENAME ~ /.*\.sh$/)
+        return "sh " FILENAME
+}

@@ -14,6 +14,22 @@ function transition(nstate) {
         print "```"
     if(state == TEXT)
         print ""
+    if(state == PIPE)
+    {
+        if(pipe_tee)
+        {
+            print "```"
+            for(pipe_line = 1; pipe_line <= pipe_lines; pipe_line++)
+                print pipe_text[pipe_line]
+            print "```"
+        }
+        print "```"
+        for(pipe_line = 1; pipe_line <= pipe_lines; pipe_line++)
+            print pipe_text[pipe_line] | pipe_command
+        print "```"
+        pipe_lines = 0
+        close(pipe_command)
+    }
     state = nstate
 }
 
@@ -28,30 +44,61 @@ BEGIN {
 }
 
 record_is_directive() {
-    if(LITKEY == "run" || LITKEY == "sub")
+    if(LITKEY == "exe" || LITKEY == "sub")
     {
         if(length(LITVAL))
         {
-            if(LITKEY == "run")
+            print "```"
+            if(LITKEY == "exe")
+            {
+                print LITVAL
+                print ""
+            }
+            if(system(LITVAL))
+            {
+                print "ERROR: command failed"
+                if(LITKEY == "sub")
+                    print "  command was " LITVAL
+            }
+            print "```"
+        }
+    }
+    if(LITKEY == "run")
+    {
+        if(!file_is_text_doc())
+        {
+            build_command = build_command_for_file()
+            run_command = run_command_for_file()
+            if(length(build_command))
             {
                 print "```"
-                print LITVAL
+                print build_command
+                print ""
+                if(system(build_command))
+                    print "ERROR: build command failed"
+                close(build_command)
                 print "```"
             }
-            system(LITVAL)
-        }
-        else if(!file_is_text_doc())
-        {
-            print "```"
-            print "TODO build/run file with options: '" LITVAL "'"
-            print "```"
+            if(length(run_command))
+            {
+                print "```"
+                print run_command
+                print ""
+                if(system(run_command))
+                    print "ERROR: run command failed"
+                close(build_command)
+                print "```"
+            }
         }
     }
     if(LITKEY == "tee" || LITKEY == "pipe")
     {
-        PIPE_TEE = (LITKEY == "tee")
-        PIPE_COMMAND = LITVAL
-        transition(PIPE_NEXT)
+        if(length(LITVAL))
+        {
+            pipe_tee = (LITKEY == "tee")
+            pipe_command = LITVAL
+            transition(PIPE_NEXT)
+        }
     }
     if(LITKEY == "skip")
         transition(SKIP)
@@ -67,7 +114,7 @@ record_is_directive() {
 state == SKIP { next }
 state == PIPE_NEXT && !record_is_comment() && length($0) { transition(PIPE) }
 state == PIPE && record_is_comment() { transition(START) }
-state == PIPE { print "TODO " $0 " | " PIPE_COMMAND }
+state == PIPE { pipe_text[++pipe_lines] = $0 }
 state == TEXT && !record_is_comment() { transition(START) }
 state == TEXT { print COMMENT }
 state == START && length($0) { transition(CODE) }

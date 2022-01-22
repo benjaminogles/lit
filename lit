@@ -51,11 +51,14 @@ recurse() {
 }
 
 dotest() {
-    [ -d ./tests ] || fail "test directory does not exist"
+    indir=/tmp/lit.in.d
     outdir=/tmp/lit.out.d
-    mkdir -p $outdir
-    echo "running tests"
-    for testin in $(find ./tests -mindepth 1 -maxdepth 1 -name '*.html' -o -name "*.md" -prune -o -print)
+    [ -d ./tests ] || fail "test directory does not exist"
+    [ -d $indir ] && rm -r $indir
+    [ -d $outdir ] && rm -r $outdir
+    cp -r ./tests $indir
+    mkdir $outdir
+    for testin in $(find $indir -mindepth 1 -maxdepth 1 -name '*.html' -o -name '*.md' -prune -o -print)
     do
         if [ -d "$testin" ]
         then
@@ -77,18 +80,24 @@ dotest() {
         then
             fail "expected test output not found: $testin.html"
         else
-            echo "running $testin"
+            echo "running $testin (${testargs[@]})"
             recurse -o $outdir markdown "${testargs[@]}"
             recurse -o $outdir html "${testargs[@]}"
             diff "$testin.md" $outdir/index.md || fail "failed test: $testin"
             diff "$testin.html" $outdir/index.html || fail "failed test: $testin"
         fi
     done
+    rm -r $indir $outdir
     echo "all tests passed"
 }
 
 domarkdown() {
-    awk -f "$pscripts/lit-utils.awk" -f "$pscripts/lit-main.awk" "$@"
+    for infile in "$@"
+    do
+        pushd "$(dirname "$infile")" > /dev/null
+        awk -f "$pscripts/lit-utils.awk" -f "$pscripts/lit-main.awk" "$(basename "$infile")"
+        popd > /dev/null
+    done
 }
 
 dohtml() {
@@ -103,7 +112,7 @@ EOF
 
     [ -f "$pmeta" ] && cat "$pmeta"
 
-    awk -f "$pscripts/lit-utils.awk" -f "$pscripts/lit-meta.awk" "${pfiles[@]}"
+    awk -f "$pscripts/lit-utils.awk" -f "$pscripts/lit-meta.awk" "$@"
 
     cat <<EOF
 </head>
@@ -137,7 +146,7 @@ pmeta=
 pheader=
 pfooter=
 pdir=${LIT_OUT_DIR:-$(pwd)}
-pscripts=${LIT_SCRIPT_DIR:-$(dirname "$0")/scripts}
+pscripts=$(cd $(dirname "$0"); pwd -P)/scripts
 
 while getopts :t:m:h:f:o: arg
 do

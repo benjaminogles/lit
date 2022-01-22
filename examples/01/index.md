@@ -31,7 +31,13 @@ Running the Program
 
 C programs must be compiled to instructions specific to your processor.
 
+```
+gcc -o hello_world hello_world.c
 
 ```
-TODO: run file
+```
+./hello_world
+
+Hello World
+Hello World
 ```
