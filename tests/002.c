@@ -31,4 +31,4 @@ int main(void)
 //
 // C programs must be compiled to instructions specific to your processor.
 //
-// lit run
+// lit execute

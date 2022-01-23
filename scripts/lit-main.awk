@@ -10,26 +10,28 @@ function ending_code_block(nstate)
 }
 
 function transition(nstate) {
-    if(starting_code_block(nstate) || ending_code_block(nstate))
-        print "```"
     if(state == TEXT)
         print ""
-    if(state == PIPE)
+    else if(state == PIPE)
     {
         if(pipe_tee)
         {
-            print "```"
+            print "```" file_language()
             for(pipe_line = 1; pipe_line <= pipe_lines; pipe_line++)
                 print pipe_text[pipe_line]
             print "```"
         }
-        print "```"
+        print "```plaintext"
         for(pipe_line = 1; pipe_line <= pipe_lines; pipe_line++)
             print pipe_text[pipe_line] | pipe_command
         print "```"
         pipe_lines = 0
         close(pipe_command)
     }
+    if(starting_code_block(nstate))
+        print "```" file_language()
+    else if(ending_code_block(nstate))
+        print "```"
     state = nstate
 }
 
@@ -44,26 +46,27 @@ BEGIN {
 }
 
 record_is_directive() {
-    if(LITKEY == "exe" || LITKEY == "sub")
+    if(LITKEY == "run" || LITKEY == "substitute")
     {
         if(length(LITVAL))
         {
-            print "```"
-            if(LITKEY == "exe")
+            if(LITKEY == "run")
             {
+                print "```sh"
                 print LITVAL
-                print ""
+                print "```"
             }
+            print "```plaintext"
             if(system(LITVAL))
             {
                 print "ERROR: command failed"
-                if(LITKEY == "sub")
+                if(LITKEY == "substitute")
                     print "  command was " LITVAL
             }
             print "```"
         }
     }
-    if(LITKEY == "run")
+    if(LITKEY == "execute")
     {
         if(!file_is_text_doc())
         {
@@ -71,9 +74,10 @@ record_is_directive() {
             run_command = run_command_for_file()
             if(length(build_command))
             {
-                print "```"
+                print "```sh"
                 print build_command
-                print ""
+                print "```"
+                print "```plaintext"
                 if(system(build_command))
                     print "ERROR: build command failed"
                 close(build_command)
@@ -81,9 +85,10 @@ record_is_directive() {
             }
             if(length(run_command))
             {
-                print "```"
+                print "```sh"
                 print run_command
-                print ""
+                print "```"
+                print "```plaintext"
                 if(system(run_command))
                     print "ERROR: run command failed"
                 close(build_command)

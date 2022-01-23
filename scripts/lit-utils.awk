@@ -16,12 +16,12 @@ function strip_ext(fwithext, _pos, _chars)
 
 function file_is_text_doc()
 {
-    return FILENAME ~ /.*\.(txt|md)/
+    return FILENAME ~ /\.(txt|md)$/
 }
 
 function file_is_using_c_style_comments()
 {
-    return FILENAME ~ /.*\.(c|cc|cpp)/
+    return FILENAME ~ /\.(c|cc|cpp)$/
 }
 
 function comment_re()
@@ -86,9 +86,9 @@ function file_basename(_n, _fnameparts)
 
 function build_command_for_file()
 {
-    if(FILENAME ~ /.*\.c$/)
+    if(FILENAME ~ /\.c$/)
         return "gcc -o " strip_ext(file_basename()) " " FILENAME
-    else if(FILENAME ~ /.*\.cc$/)
+    else if(FILENAME ~ /\.cc$/)
         return "g++ -o " strip_ext(file_basename()) " " FILENAME
     else
         return ""
@@ -96,10 +96,23 @@ function build_command_for_file()
 
 function run_command_for_file()
 {
-    if(FILENAME ~ /.*\.c$/)
+    if(FILENAME ~ /\.c$/)
         return "./" strip_ext(file_basename())
-    else if(FILENAME ~ /.*\.py$/)
+    else if(FILENAME ~ /\.py$/)
         return "python3 " FILENAME
-    else if(FILENAME ~ /.*\.sh$/)
+    else if(FILENAME ~ /\.sh$/)
         return "sh " FILENAME
+}
+
+function file_language()
+{
+    if(FILENAME ~ /.*\.c$/)
+        return "c"
+    else if(FILENAME ~ /\.c(c|pp|xx)$/)
+        return "cpp"
+    else if(FILENAME ~ /\.h(h|pp|xx)?$/)
+        return "cpp"
+    else if(FILENAME ~ /\.py$/)
+        return "python"
+    return "plaintext"
 }

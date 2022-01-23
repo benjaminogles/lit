@@ -54,18 +54,19 @@ dotest() {
     indir=/tmp/lit.in.d
     outdir=/tmp/lit.out.d
     [ -d ./tests ] || fail "test directory does not exist"
-    [ -d $indir ] && rm -r $indir
-    [ -d $outdir ] && rm -r $outdir
-    cp -r ./tests $indir
-    mkdir $outdir
-    for testin in $(find $indir -mindepth 1 -maxdepth 1 -name '*.html' -o -name '*.md' -prune -o -print)
+    for testin in $(find ./tests -mindepth 1 -maxdepth 1 -name '*.html' -o -name '*.md' -prune -o -print)
     do
+        [ -d $indir ] && rm -r $indir
+        [ -d $outdir ] && rm -r $outdir
+        mkdir $indir $outdir
         if [ -d "$testin" ]
         then
             testargs=( $(find "$testin" -mindepth 1 -maxdepth 1 -type f) )
         else
             testargs=( "$testin" )
         fi
+        cp "${testargs[@]}" $indir/
+        testargs=( $indir/* )
         if [ "$1" == "generate" ]
         then
             echo "generating $testin.md and $testin.html"
@@ -80,7 +81,7 @@ dotest() {
         then
             fail "expected test output not found: $testin.html"
         else
-            echo "running $testin (${testargs[@]})"
+            echo "running $testin"
             recurse -o $outdir markdown "${testargs[@]}"
             recurse -o $outdir html "${testargs[@]}"
             diff "$testin.md" $outdir/index.md || fail "failed test: $testin"

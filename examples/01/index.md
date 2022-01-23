@@ -7,7 +7,7 @@ language.
 
 First we need to include a header.
 
-```
+```c
 #include <stdio.h>
 
 ```
@@ -16,7 +16,7 @@ Then we define the main function which will be executed when the
 program starts. It doesn't need to accept any arguments in this
 case so we just write 'void'.
 
-```
+```c
 int main(void)
 {
     // print to standard output in two ways
@@ -31,13 +31,15 @@ Running the Program
 
 C programs must be compiled to instructions specific to your processor.
 
-```
+```sh
 gcc -o hello_world hello_world.c
-
 ```
+```plaintext
 ```
+```sh
 ./hello_world
-
+```
+```plaintext
 Hello World
 Hello World
 ```

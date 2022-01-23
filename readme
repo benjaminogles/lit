@@ -58,9 +58,9 @@ description:
 directives
 ----------
 
-- run: build/execute the entire file
-- exe: display and run a shell command
-- sub: run a shell command without displaying it
+- execute: build/execute the entire file
+- run: display and run a shell command
+- substitute: run a shell command without displaying it
 - tee: display the next code block as usual and pipe it into a program
 - pipe: consume the next code block without displaying it and pipe it into a program
 - text: include comment block as text content in document
