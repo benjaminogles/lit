@@ -2,11 +2,10 @@
 lit: a literate programming tool
 ================================
 
-lit creates a markdown or HTML file from a list of text and source
+lit creates a markdown or HTML document from a list of text and source
 code files
 
-lit is intended to be used for presenting programs that were designed
-to become such documents in the first place e.g. as the subject of a
+it is intended to be used for presenting programs in the form of an e.g
 technical article or tutorial
 
 it is assumed that the input files are given in an order such that
@@ -16,9 +15,8 @@ as many source code comments will be extracted into the text content
 of the final document, they should usually form a large part of that
 narrative by explaining the program in detail
 
-markdown content and source code comments may also contain directives
-that prompt lit to build and run programs with the output inlined into
-the document
+source code comments may also contain directives that prompt lit to
+build and run programs with the output inlined into the document
 
 usage
 -----
@@ -58,17 +56,15 @@ description:
 directives
 ----------
 
-- execute: build/execute the entire file
-- run: display and run a shell command
-- substitute: run a shell command without displaying it
-- tee: display the next code block as usual and pipe it into a program
-- pipe: consume the next code block without displaying it and pipe it into a program
-- text: include comment block as text content in document
+- #!: the familar shebang is detected and used to run interpreted programs
+- output: 
+- build: build and run the file containing a compiled program
+- text: extract comments as markdown
+- skip: skip input content until next unskip directive
+- unskip: stop skipping input content
 - author: specify document author
 - title: specify document title
 - description: specify document description
-- skip: skip input content until next unskip directive
-- unskip: stop skipping input content
 
 comments translated by the text directive are treated as containing markdown content already
 

@@ -1,0 +1,97 @@
+#! /usr/bin/env bash
+
+usage() {
+    cat >&2 <<EOF
+$1
+usage:
+
+    lit2html [options] <file1> [<file2> ...]
+
+options:
+
+    -o <file>
+    -m <meta-html-file>
+    -h <header-html-file>
+    -f <footer-html-file>
+    -t <title>
+    -a <author>
+    -d <description>
+EOF
+    exit 1
+}
+
+ptitle=
+pauthor=
+pdescription=
+pmeta=
+pheader=
+pfooter=
+pfile=${LIT_OUT_DIR:-$(pwd)/index.html}
+pscripts=$(cd $(dirname "$0"); pwd -P)/scripts
+
+while getopts :t:a:d:m:h:f:o: arg
+do
+    case "$arg" in
+        m) pmeta=$OPTARG ;;
+        h) pheader=$OPTARG ;;
+        f) pfooter=$OPTARG ;;
+        o) pfile=$OPTARG ;;
+        t) ptitle=$OPTARG ;;
+        d) pdescription=$OPTARG ;;
+        a) pauthor=$OPTARG ;;
+        :) usage "-$OPTARG requires an argument" ;;
+        ?) usage "unknown option -$OPTARG" ;;
+    esac
+done
+
+shift $(( OPTIND - 1 ))
+pfiles=( "$@" )
+
+if [ ${#pfiles[@]} -eq 0 ]
+then
+    usage "you must provide at least one input file"
+fi
+
+pdir=$(dirname "$pfile")
+mkdir -p "$pdir"
+
+cat > "$pfile" <<EOF
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+EOF
+
+[ ! -z "$pauthor" ] && echo "<meta name=\"author\" content=\"$pauthor\">" >> "$pfile"
+[ ! -z "$pdescription" ] && echo "<meta name=\"description\" content=\"$pdescription\">" >> "$pfile"
+[ ! -z "$ptitle" ] && echo "<title>$ptitle</title>" >> "$pfile"
+[ -f "$pmeta" ] && cat "$pmeta" >> "$pfile"
+
+cat >> "$pfile" <<EOF
+</head>
+<body>
+EOF
+
+[ -f "$pheader" ] && cat "$pheader" >> "$pfile"
+
+cat >> "$pfile" <<EOF
+<main>
+<article>
+EOF
+
+cat "${pfiles[@]}" | md2html >> "$pfile"
+
+cat >> "$pfile" <<EOF
+</article>
+</main>
+EOF
+
+[ -f "$pfooter" ] && cat "$pfooter" >> "$pfile"
+
+cat >> "$pfile" <<EOF
+</body>
+</html>
+EOF
+
