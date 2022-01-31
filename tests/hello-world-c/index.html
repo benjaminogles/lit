@@ -1,0 +1,35 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<main>
+<article>
+<h2>Hello World in C</h2>
+<p>This program prints the words &quot;Hello World&quot; to standard output and exits.</p>
+<p>First we need to include a header.</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+</code></pre>
+<p>Next we define the main function that will be called when the program starts.</p>
+<pre><code class="language-c">int main(void)
+{
+    // printf always prints to standard output
+    printf(&quot;Hello World\n&quot;);
+    return 0;
+}
+</code></pre>
+<p>C programs must be compiled to machine instructions specific to your processor.</p>
+<pre><code class="language-sh">gcc -o hello_world hello_world.c
+</code></pre>
+<p>Now we can run the program and see the output.</p>
+<pre><code class="language-sh">./hello_world
+</code></pre>
+<pre><code class="language-plaintext">Hello World
+</code></pre>
+</article>
+</main>
+</body>
+</html>

@@ -86,7 +86,7 @@ dotest() {
         [ -d $indir ] && rm -r $indir
         [ -d $outdir ] && rm -r $outdir
         cp -r "$testin" $indir
-        testargs=( $(find $indir -type f ! -name '*.md') )
+        testargs=( $(find $indir -type f ! -name '*.md' ! -name "*.html") )
         if [ "$1" == "generate" ]
         then
             echo "generating $testin/index.md"
@@ -121,15 +121,15 @@ done
 
 shift $(( OPTIND - 1 ))
 
-if [ -z "$@" ]
-then
-    usage
-fi
-
 if [ ! -z "$ptest" ]
 then
     dotest "$ptest"
     exit 0
+fi
+
+if [ -z "$@" ]
+then
+    usage
 fi
 
 [ -f "$pfile" ] && rm "$pfile"

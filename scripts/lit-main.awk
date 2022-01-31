@@ -141,6 +141,7 @@ function transition(nstate) {
     else if(ending_code_block(nstate))
         print "```"
     state = nstate
+    nblank = 0
 }
 
 BEGIN {
@@ -150,6 +151,7 @@ BEGIN {
 
     state = START
     skipping = 0
+    nblank = 0
 
     if(!length(OUTPUT_DIR))
         OUTPUT_DIR = "."
@@ -175,7 +177,9 @@ record_is_directive() {
         print "# " LITVAL
     else if(LITKEY == "execute")
     {
-        transition(START)
+        if(state == CODE)
+            transition(START)
+
         if(length(LITVAL))
         {
             print "```sh"
@@ -248,7 +252,17 @@ skipping { next }
 state == TEXT && !record_is_comment() { transition(START) }
 state == TEXT { print COMMENT }
 state == START && length($0) { transition(CODE) }
-state == CODE { print }
+state == CODE {
+    if(length($0))
+    {
+        for(i = 1; i <= nblank; i++)
+            print ""
+        print
+        nblank = 0
+    }
+    else
+        nblank++
+}
 
 END {
     try_repl_cleanup()
