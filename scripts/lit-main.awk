@@ -110,12 +110,12 @@ function init_or_insert_figures(_init, _command, _output, _parts, _name, _mtime)
         if(!_init)
         {
             if(!FIGURES[_name]) FIGURES[_name] = _mtime - 1
-            if(_mtime > FIGURES[_mtime])
+            if(_mtime > FIGURES[_name])
             {
                 if(system("cp " _name " " OUTPUT_DIR "/" FIGURES_DIR "/" basename(_name)))
                     print "Failed to copy figure to output directory"
                 else
-                    print "![](" FIGURE_DIR "/" basename(_name) ")"
+                    print "![](" FIGURES_DIR "/" basename(_name) ")"
             }
         }
         FIGURES[_name] = _mtime
@@ -155,7 +155,7 @@ BEGIN {
 
     if(!length(OUTPUT_DIR))
         OUTPUT_DIR = "."
-    if(!length(FIGURE_DIR))
+    if(!length(FIGURES_DIR))
         FIGURE_DIR = "."
     init_or_insert_figures(1)
 }

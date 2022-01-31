@@ -86,12 +86,13 @@ dotest() {
         [ -d $indir ] && rm -r $indir
         [ -d $outdir ] && rm -r $outdir
         cp -r "$testin" $indir
-        testargs=( $(find $indir -type f ! -name '*.md' ! -name "*.html") )
+        testargs=( $(find $indir -maxdepth 1 -type f ! -name '*.md' ! -name "*.html") )
         if [ "$1" == "generate" ]
         then
-            echo "generating $testin/index.md"
+            echo "generating $testin/index.md (${testargs[@]})"
             recurse -o $outdir/index.md "${testargs[@]}"
             cp $outdir/index.md "$testin/index.md"
+            [ -d $outdir/index-figures ] && cp -r $outdir/index-figures "$testin/"
         elif [ ! -f "$testin/index.md" ]
         then
             fail "expected test output not found: $testin/index.md"
@@ -127,7 +128,7 @@ then
     exit 0
 fi
 
-if [ -z "$@" ]
+if [ $# -eq 0 ]
 then
     usage
 fi
@@ -148,7 +149,7 @@ mkfifo "$pfifo"
 
 cleanup() {
     rm -rf "$pscratch"
-    if [ -n $(find "$pdir/$pfigures" -mindepth 0 -maxdepth 0 -type d -empty) ]
+    if [ -z "$(find "$pdir/$pfigures" -mindepth 1 -maxdepth 1 -type f)" ]
     then
         rmdir "$pdir/$pfigures"
     fi
@@ -171,7 +172,7 @@ do
             -v FIGURES_DIR="$pfigures" \
             -v BREAKPOINT_FIFO="$pfifo" \
             -f "$pscripts/lit-main.awk" \
-            "$infile" >> "$pfile"
+            "$(basename "$infile")" >> "$pfile"
         popd > /dev/null
     fi
 done

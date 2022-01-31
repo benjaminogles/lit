@@ -1,0 +1,30 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<main>
+<article>
+<h2>Plotting with Python</h2>
+<p>Plotting is often done with the matplotlib library.</p>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+</code></pre>
+<p>Note: in an interactive script, you would want to use plt.show() rather than plt.savefig().</p>
+<p>Here is a simple example.</p>
+<pre><code class="language-python">plt.plot(range(-10, 10), [x**2 for x in range(-10, 10)])
+plt.savefig(&quot;xsquared.png&quot;)
+</code></pre>
+<p><img src="index-figures/xsquared.png" alt=""></p>
+<p>You can plot more than one curve on the same plot.</p>
+<pre><code class="language-python">plt.plot(range(-10, 10), [x**2 for x in range(-10, 10)])
+plt.plot(range(-10, 10), [x**3 for x in range(-10, 10)])
+plt.savefig(&quot;xsquared-and-cubed.png&quot;)
+</code></pre>
+<p><img src="index-figures/xsquared-and-cubed.png" alt=""></p>
+</article>
+</main>
+</body>
+</html>
