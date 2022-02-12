@@ -243,6 +243,7 @@ record_is_directive() {
         {
             print repl_command > repl_in
             close(repl_in)
+            repl_command = ""
         }
     }
     next
