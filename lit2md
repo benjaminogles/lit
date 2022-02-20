@@ -107,7 +107,7 @@ dotest() {
 
 ptest=
 pfile=${LIT_OUT_DIR:-$(pwd)}/index.md
-proot=$(cd $(dirname "$0"); pwd -P)
+proot=$(cd $(dirname $(readlink -f "$0")); pwd -P)
 pscripts=$proot/scripts
 
 while getopts :t:o: arg
@@ -162,7 +162,7 @@ do
     inext=${infile##*.}
     if [ ! -f "$infile" ]
     then
-        fail "could not find input file $infile"
+        fail "could not find input file $infile ($(pwd))"
     elif [ "$inext" == "txt" ] || [ "$inext" == "md" ]
     then
         cat "$infile" >> "$pfile"
