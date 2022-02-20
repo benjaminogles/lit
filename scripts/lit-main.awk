@@ -266,5 +266,6 @@ state == CODE {
 }
 
 END {
+    transition(START)
     try_repl_cleanup()
 }
