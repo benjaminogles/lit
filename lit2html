@@ -23,18 +23,18 @@ EOF
 ptitle=
 pauthor=
 pdescription=
-pmeta=
-pheader=
-pfooter=
+pmeta=(  )
+pheader=(  )
+pfooter=(  )
 pfile=${LIT_OUT_DIR:-$(pwd)/index.html}
 pscripts=$(cd $(dirname "$0"); pwd -P)/scripts
 
 while getopts :t:a:d:m:h:f:o: arg
 do
     case "$arg" in
-        m) pmeta=$OPTARG ;;
-        h) pheader=$OPTARG ;;
-        f) pfooter=$OPTARG ;;
+        m) pmeta+=( "$OPTARG" ) ;;
+        h) pheader+=( "$OPTARG" ) ;;
+        f) pfooter+=( "$OPTARG" ) ;;
         o) pfile=$OPTARG ;;
         t) ptitle=$OPTARG ;;
         d) pdescription=$OPTARG ;;
@@ -67,14 +67,20 @@ EOF
 [ ! -z "$pauthor" ] && echo "<meta name=\"author\" content=\"$pauthor\">" >> "$pfile"
 [ ! -z "$pdescription" ] && echo "<meta name=\"description\" content=\"$pdescription\">" >> "$pfile"
 [ ! -z "$ptitle" ] && echo "<title>$ptitle</title>" >> "$pfile"
-[ -f "$pmeta" ] && cat "$pmeta" >> "$pfile"
+for metahtml in "${pmeta[@]}"
+do
+    [ -f "$metahtml" ] && cat "$metahtml" >> "$pfile"
+done
 
 cat >> "$pfile" <<EOF
 </head>
 <body>
 EOF
 
-[ -f "$pheader" ] && cat "$pheader" >> "$pfile"
+for headerhtml in "${pheader[@]}"
+do
+    [ -f "$headerhtml" ] && cat "$headerhtml" >> "$pfile"
+done
 
 cat >> "$pfile" <<EOF
 <main>
@@ -88,7 +94,10 @@ cat >> "$pfile" <<EOF
 </main>
 EOF
 
-[ -f "$pfooter" ] && cat "$pfooter" >> "$pfile"
+for footerhtml in "${pfooter[@]}"
+do
+    [ -f "$footerhtml" ] && cat "$footerhtml" >> "$pfile"
+done
 
 cat >> "$pfile" <<EOF
 </body>
