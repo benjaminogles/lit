@@ -135,8 +135,9 @@ fi
 
 [ -f "$pfile" ] && rm "$pfile"
 
-pdir=$(dirname "$pfile")
+pdir=$(cd "$(dirname "$pfile")"; pwd)
 mkdir -p "$pdir"
+pfile=$pdir/$(basename "$pfile")
 
 pfigures=$(basename "$pfile")
 pfigures=${pfigures%%.*}-figures
