@@ -109,12 +109,14 @@ ptest=
 pfile=${LIT_OUT_DIR:-$(pwd)}/index.md
 proot=$(cd $(dirname $(readlink -f "$0")); pwd -P)
 pscripts=$proot/scripts
+ptimeout=5
 
-while getopts :t:o: arg
+while getopts :c:t:o: arg
 do
     case "$arg" in
-        t) ptest=$OPTARG ;;
+        c) ptest=$OPTARG ;;
         o) pfile=$OPTARG ;;
+        t) ptimeout=$OPTARG ;;
         :) usage "-$OPTARG requires an argument" ;;
         ?) usage "unknown option -$OPTARG" ;;
     esac
@@ -135,8 +137,8 @@ fi
 
 [ -f "$pfile" ] && rm "$pfile"
 
+mkdir -p "$(dirname "$pfile")"
 pdir=$(cd "$(dirname "$pfile")"; pwd)
-mkdir -p "$pdir"
 pfile=$pdir/$(basename "$pfile")
 
 pfigures=$(basename "$pfile")
@@ -169,7 +171,7 @@ do
         cat "$infile" >> "$pfile"
     else
         pushd "$(dirname "$infile")" > /dev/null
-        awk -v OUTPUT_DIR="$pdir" \
+        timeout $ptimeout awk -v OUTPUT_DIR="$pdir" \
             -v FIGURES_DIR="$pfigures" \
             -v BREAKPOINT_FIFO="$pfifo" \
             -f "$pscripts/lit-main.awk" \
