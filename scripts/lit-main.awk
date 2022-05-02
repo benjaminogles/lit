@@ -101,7 +101,7 @@ function record_is_directive()
 
 function init_or_insert_figures(_init, _command, _output, _parts, _name, _mtime)
 {
-    _command = "find . -maxdepth 1 -type f -name '*.png' -printf '%p|' -exec date +%H%M%N -r {} \\;"
+    _command = "find . -maxdepth 1 -type f -name '*.png' -printf '%p|' -exec date +%Y%m%d%H%M%S.%N -r {} \\;"
     while((_command | getline _output) > 0)
     {
         split(_output, _parts, "|")
@@ -112,8 +112,11 @@ function init_or_insert_figures(_init, _command, _output, _parts, _name, _mtime)
             if(!FIGURES[_name]) FIGURES[_name] = _mtime - 1
             if(_mtime > FIGURES[_name])
             {
-                if(system("cp " _name " " OUTPUT_DIR "/" FIGURES_DIR "/" basename(_name)))
-                    print "Failed to copy figure to output directory"
+                if(system("cp " _name " " OUTPUT_DIR "/" FIGURES_DIR "/" basename(_name))) {
+                    print "Failed to copy figure to output directory" | "cat 1>&2"
+                    try_repl_cleanup()
+                    exit(1)
+                }
                 else
                     print "![](" FIGURES_DIR "/" basename(_name) ")"
             }
