@@ -116,5 +116,5 @@ endef
 $(foreach d,$(SOURCE_DIRS),$(eval $(call target_page_rules,$(d))))
 
 clean:
-	[ -d "$(TARGET_DIR)" ] && rm -r "$(TARGET_DIR)"
-	[ -d "$(TOOLS_DIR)" ] && rm -r "$(TOOLS_DIR)"
+	if [ -d "$(TARGET_DIR)" ]; then rm -r "$(TARGET_DIR)"; fi
+	if [ -d "$(TOOLS_DIR)" ]; then rm -r "$(TOOLS_DIR)"; fi
