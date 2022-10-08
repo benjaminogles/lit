@@ -49,10 +49,12 @@ MD2HTML := $(TOOLS_DIR)/bin/md2html
 # md2html lives in a submodule
 $(MD4C_SUBMODULE_PATH)/md2html:
 	git submodule update --init $(MD4C_SUBMODULE_PATH)
+
+$(MD4C_SUBMODULE_PATH)/build: | $(MD4C_SUBMODULE_PATH)/md2html
 	cmake -B $(MD4C_SUBMODULE_PATH)/build -S $(MD4C_SUBMODULE_PATH) -DCMAKE_INSTALL_PREFIX=$(TOOLS_DIR)
 
 # build and install it into the tools directory
-$(MD2HTML): | $(MD4C_SUBMODULE_PATH)/md2html
+$(MD2HTML): | $(MD4C_SUBMODULE_PATH)/build
 	make -C $(MD4C_SUBMODULE_PATH)/build install
 
 # lit scripts use md2html
