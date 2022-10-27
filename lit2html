@@ -91,6 +91,11 @@ cat "${pfiles[@]}" | md2html >> "$pfile"
 
 cat >> "$pfile" <<EOF
 </article>
+EOF
+
+echo "<footer>Last edit: $(date)</footer>" >> "$pfile"
+
+cat >> "$pfile" <<EOF
 </main>
 EOF
 
